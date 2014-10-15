@@ -1,0 +1,28 @@
+*cmakeproj.txt* Helper plugin for cmake projects
+
+Author: Pavel Novy <http://tilda.nartech.org>
+License: Same terms as Vim itself (see |license|)
+
+COMMANDS                                               *cmakeproj-commands*
+
+                                                       *cmakeproj-:BuildType*
+:BuildType [type]         Sets build type.
+                          Argument [type] can be 'debug' or 'release'.
+
+                                                       *cmakeproj-:BuildTarget*
+:BuildTarget [target]     Sets makefile target to build.
+
+                                                       *cmakeproj-:RunCMake*
+:RunCMake                 Runs CMake.
+
+
+GLOBAL OPTIONS                                         *cmakeproj-options*
+
+                                                       *cmakeproj_cmake_bin*
+Default: "cmake"
+Path to CMake command
+                                                       *cmakeproj_generator*
+Default: "ninja"
+Generator to use when running CMake. Currently it can be 'ninja' or 'make'.
+
+ vim:tw=78:sw=4:ft=help:norl:
