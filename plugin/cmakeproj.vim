@@ -90,6 +90,26 @@ function! s:RunCMake() abort
   execute '!cd '.s:build_dir.' && '.g:cmakeproj_cmake_bin.cmake_generator.cmake_args.' ../..'
 endfunction
 
+function! cmakeproj#OpenCMakeHelp()
+    let s = getline( '.' )
+    let i = col( '.' ) - 1
+    while i > 0 && strpart( s, i, 1 ) =~ '[A-Za-z0-9_]'
+        let i = i - 1
+    endwhile
+    while i < col('$') && strpart( s, i, 1 ) !~ '[A-Za-z0-9_]'
+        let i = i + 1
+    endwhile
+    let start = match( s, '[A-Za-z0-9_]\+', i )
+    let end = matchend( s, '[A-Za-z0-9_]\+', i )
+    let ident = strpart( s, start, end - start )
+    execute 'vertical new'
+    execute '%!'.g:cmakeproj_cmake_bin.' --help-command '.ident
+    set nomodified
+    set readonly
+endfunction
+
+autocmd BufRead,BufNewFile *.cmake,CMakeLists.txt nmap <F1> :execute cmakeproj#OpenCMakeHelp()<CR>
+
 command! -nargs=1 -complete=customlist,s:SetBuildTypeComplete BuildType :execute s:SetBuildType(<q-args>)
 command! -nargs=1 -complete=customlist,s:SetBuildTargetComplete BuildTarget :execute s:SetBuildTarget(<q-args>)
 command! -nargs=0 RunCMake :execute s:RunCMake()
