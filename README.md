@@ -1,4 +1,4 @@
-cmakeproj-vim
+vim-cmakeproj
 =============
 
-vim plugin for cmake projects
+VIM plugin for working with CMake projects.

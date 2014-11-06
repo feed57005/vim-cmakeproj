@@ -25,6 +25,7 @@ let s:build_type = 'debug'
 let s:platform = ''
 let s:target = ''
 let s:build_dir = ''
+let s:prefix = ''
 
 if has('win32')
   let s:sep = '\'
@@ -75,6 +76,10 @@ function! s:SetBuildTarget(target) abort
   call s:UpdateMakePrg()
 endfunction
 
+function! s:SetBuildPrefix(prefix) abort
+  let s:prefix = a:prefix
+endfunction
+
 function! s:RunCMake() abort
   for type_pair in [['debug', 'Debug'], ['release', 'Release']]
     if type_pair[0] == s:build_type
@@ -83,36 +88,47 @@ function! s:RunCMake() abort
   endfor
   for gen_pair in [['ninja', 'Ninja'], ['make', 'Unix Makefiles']]
     if gen_pair[0] == s:generator
-      let cmake_generator =' -G "'.gen_pair[1].'"'
+      let cmake_args .=' -G "'.gen_pair[1].'"'
+      break
     endif
   endfor
+  if s:prefix != ''
+    let cmake_args .= ' -DCMAKE_INSTALL_PREFIX='.s:prefix
+  endif
   silent execute '!mkdir -p '. s:build_dir
-  execute '!cd '.s:build_dir.' && '.g:cmakeproj_cmake_bin.cmake_generator.cmake_args.' ../..'
+  echo cmake_args
+  execute '!cd '.s:build_dir.' && '.g:cmakeproj_cmake_bin.cmake_args.' ../..'
+endfunction
+
+function! s:CleanCMake() abort
+  execute '!rm -rf '. s:build_dir
 endfunction
 
 function! cmakeproj#OpenCMakeHelp()
-    let s = getline( '.' )
-    let i = col( '.' ) - 1
-    while i > 0 && strpart( s, i, 1 ) =~ '[A-Za-z0-9_]'
-        let i = i - 1
-    endwhile
-    while i < col('$') && strpart( s, i, 1 ) !~ '[A-Za-z0-9_]'
-        let i = i + 1
-    endwhile
-    let start = match( s, '[A-Za-z0-9_]\+', i )
-    let end = matchend( s, '[A-Za-z0-9_]\+', i )
-    let ident = strpart( s, start, end - start )
-    execute 'vertical new'
-    execute '%!'.g:cmakeproj_cmake_bin.' --help-command '.ident
-    set nomodified
-    set readonly
+  let s = getline( '.' )
+  let i = col( '.' ) - 1
+  while i > 0 && strpart( s, i, 1 ) =~ '[A-Za-z0-9_]'
+    let i = i - 1
+  endwhile
+  while i < col('$') && strpart( s, i, 1 ) !~ '[A-Za-z0-9_]'
+    let i = i + 1
+  endwhile
+  let start = match( s, '[A-Za-z0-9_]\+', i )
+  let end = matchend( s, '[A-Za-z0-9_]\+', i )
+  let ident = strpart( s, start, end - start )
+  execute 'vertical new'
+  execute '%!'.g:cmakeproj_cmake_bin.' --help-command '.ident
+  set nomodified
+  set readonly
 endfunction
 
 autocmd BufRead,BufNewFile *.cmake,CMakeLists.txt nmap <F1> :execute cmakeproj#OpenCMakeHelp()<CR>
 
 command! -nargs=1 -complete=customlist,s:SetBuildTypeComplete BuildType :execute s:SetBuildType(<q-args>)
 command! -nargs=1 -complete=customlist,s:SetBuildTargetComplete BuildTarget :execute s:SetBuildTarget(<q-args>)
+command! -nargs=1 BuildPrefix :execute s:SetBuildPrefix(<q-args>)
 command! -nargs=0 RunCMake :execute s:RunCMake()
+command! -nargs=0 CleanCMake :execute s:CleanCMake()
 
 call s:DetectPlatform()
 call s:UpdateMakePrg()
