@@ -65,7 +65,7 @@ function! s:UpdateMakePrg() abort
 endfunction
 
 function! s:SetBuildGeneratorComplete(A,L,P) abort
-  let opts = s:build_generators
+  let opts = copy(s:build_generators)
   return filter(sort(opts), 'strpart(v:val, 0, strlen(a:A)) ==# a:A')
 endfunction
 
@@ -83,7 +83,7 @@ function! s:SetBuildGenerator(generator) abort
 endfunction
 
 function! s:SetBuildTypeComplete(A,L,P) abort
-  let opts = s:build_types
+  let opts = copy(s:build_types)
   return filter(sort(opts), 'strpart(v:val, 0, strlen(a:A)) ==# a:A')
 endfunction
 
