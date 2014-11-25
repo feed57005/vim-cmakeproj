@@ -58,7 +58,7 @@ endfunction
 
 function! s:UpdateMakePrg() abort
   let s:build_dir = getcwd() . s:sep . s:build_root . s:sep . s:generator.'-'.s:build_type.'-'.s:platform
-  let &makeprg = "ninja\ -C\ ".s:build_dir
+  let &makeprg = s:generator."\ -C\ ".s:build_dir
   if s:target != ''
     let &makeprg .= ' '.s:target
   endif
