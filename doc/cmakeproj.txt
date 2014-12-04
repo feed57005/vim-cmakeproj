@@ -1,28 +1,55 @@
-*cmakeproj.txt* Helper plugin for cmake projects
-
-Author: Pavel Novy <http://tilda.nartech.org>
-License: Same terms as Vim itself (see |license|)
-
-COMMANDS                                               *cmakeproj-commands*
-
-                                                       *cmakeproj-:BuildType*
-:BuildType [type]         Sets build type.
-                          Argument [type] can be 'debug' or 'release'.
-
-                                                       *cmakeproj-:BuildTarget*
-:BuildTarget [target]     Sets makefile target to build.
-
-                                                       *cmakeproj-:RunCMake*
-:RunCMake                 Runs CMake.
+*cmakeproj.txt* Helper plugin for cmake projects                 *cmakeproj*
 
 
-GLOBAL OPTIONS                                         *cmakeproj-options*
+Plugin that manages the content of |makeprg|.
 
-                                                       *cmakeproj_cmake_bin*
+=============================================================================
+COMMANDS ~
+                                                         *cmakeproj-commands*
+
+
+                                                        *cmakeproj:CMType*
+:CMType [type]             Sets build type.
+                              Argument [type] can be 'debug' or 'release'.
+
+
+                                                      *cmakeproj:CMTarget*
+:CMTarget [target]         Sets CMake target to build.
+
+
+                                                   *cmakeproj:CMGenerator*
+:CMGenerator [generator]   Sets CMake generator to use.
+                              Argument [generator] can be 'ninja' or 'make'
+															and 'xcode' on MacOSX.
+
+
+                                                      *cmakeproj:CMPrefix*
+:CMPrefix [prefix]         Sets the value of CMAKE_INSTALL_PREFIX.
+
+
+                                        *cmakeproj:CMSourceFromBuffer*
+:CMSourceFromBuffer [prefix]
+                             Sets
+
+
+                                                         *cmakeproj:RunCMake*
+:RunCMake                     Runs CMake.
+
+
+=============================================================================
+GLOBAL OPTIONS ~
+                                                          *cmakeproj-options*
+
+
+                                                      *g:cmakeproj_cmake_bin*
 Default: "cmake"
 Path to CMake command
-                                                       *cmakeproj_generator*
+                                                      *g:cmakeproj_generator*
 Default: "ninja"
 Generator to use when running CMake. Currently it can be 'ninja' or 'make'.
+
+                                                     *g:cmakeproj_build_root*
+Default: "_build"
+Relative path from g:cmakeproj_cmake_root to directory root.
 
  vim:tw=78:sw=4:ft=help:norl:
