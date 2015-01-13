@@ -27,7 +27,7 @@ let s:platform = ''
 let s:target = ''
 let s:build_dir = ''
 let s:prefix = ''
-let s:crossplatform = ''
+let s:toolchain = ''
 let s:build_types = [
 	\['debug', 'Debug'],
 	\['release', 'Release']]
@@ -140,6 +140,16 @@ function! s:cmd_CMakeSourceFromBuffer() abort
 	call s:UpdateMakePrg()
 endfunction
 
+function! s:cmd_CMakeToolchain(toolchain) abort
+	if a:toolchain == ''
+		echo s:toolchain
+		return
+	endif
+	let s:toolchain = a:toolchain
+	let s:platform = fnamemodify(a:toolchain,':t:r')
+	call s:UpdateMakePrg()
+endfunction
+
 function! s:cmd_CMakeRun() abort
 	" build type
 	let idx = index(s:build_types, s:build_type)
@@ -155,6 +165,11 @@ function! s:cmd_CMakeRun() abort
   if s:prefix != ''
     let cmake_args .= ' -DCMAKE_INSTALL_PREFIX='.s:prefix
   endif
+	" toolchain
+	if s:toolchain != ''
+		let cmake_args .= ' -DCMAKE_TOOLCHAIN_FILE='.s:toolchain
+	endif
+
   silent execute '!mkdir -p '. s:build_dir
   "execute '!echo running cmake with args: '.cmake_args. ' '.s:generator
   execute '!cd '.s:build_dir.' && '.g:cmakeproj_cmake_bin.cmake_args.' ../..'
@@ -191,6 +206,7 @@ command! -nargs=? -complete=customlist,s:cmd_CMakeGeneratorComplete CMGenerator 
 command! -nargs=? -complete=customlist,s:cmd_CMakeBuildTypeComplete CMBuildType :execute s:cmd_CMakeBuildType(<q-args>)
 command! -nargs=? -complete=customlist,s:cmd_CMakeTargetComplete CMTarget :execute s:cmd_CMakeTarget(<q-args>)
 command! -nargs=1 CMInstalPrefix :execute s:cmd_CMakeInstallPrefix(<q-args>)
+command! -nargs=? -complete=file CMToolchain :execute s:cmd_CMakeToolchain(<q-args>)
 command! -nargs=0 CMSourceFromBuffer :execute s:cmd_CMakeSourceFromBuffer()
 command! -nargs=0 CMRun :execute s:cmd_CMakeRun()
 command! -nargs=0 CMClean :execute s:cmd_CMakeClean()
