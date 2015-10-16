@@ -1,4 +1,4 @@
-" cmakeproj.vim - helper plugin for cmake projects
+" cmakeproj.vim - Helper plugin for CMake projects
 " Maintainer:   Pavel Novy
 " Version:      0.2
 
@@ -19,6 +19,13 @@ if !exists('g:cmakeproj_build_root')
   let g:cmakeproj_build_root = '_build'
 endif
 
+if has('win32')
+  let s:sep = '\'
+else
+  let s:sep = '/'
+endif
+
+let s:enabled = filereadable(getcwd().s:sep.'CMakeLists.txt')
 let s:cmake_root = getcwd()
 let s:build_root = g:cmakeproj_build_root " relative path
 let s:generator = g:cmakeproj_default_generator
@@ -42,9 +49,8 @@ let s:build_generators = ['ninja', 'make']
 let s:build_generators_cmake = ['Ninja', 'Unix Makefiles']
 
 if has('win32')
-  let s:sep = '\'
+  " TODO
 else
-  let s:sep = '/'
 	if has('mac') || has('macunix')
 		let s:build_generators += ['xcode']
 		let s:build_generators_cmake += ['Xcode']
@@ -65,6 +71,9 @@ function s:DetectPlatform() abort
 endfunction
 
 function! s:UpdateMakePrg() abort
+  if s:enabled != 1
+    return
+  endif
   let s:build_dir = s:cmake_root . s:sep . s:build_root . s:sep . s:generator.'-'.s:build_type.'-'.s:platform
   let &makeprg = s:generator."\ -C\ ".s:build_dir
   if s:target != ''
@@ -137,6 +146,7 @@ function! s:cmd_CMakeSourceFromBuffer() abort
 	echo fnamemodify(expand(bufname('%')), ":h")
 	cd %:p:h
 	let s:cmake_root = getcwd()
+  let s:enabled = filereadable(getcwd().s:sep.'CMakeLists.txt')
 	call s:UpdateMakePrg()
 endfunction
 
@@ -151,6 +161,10 @@ function! s:cmd_CMakeToolchain(toolchain) abort
 endfunction
 
 function! s:cmd_CMakeRun() abort
+  if s:enabled != 1
+    return
+  endif
+
 	" build type
 	let idx = index(s:build_types, s:build_type)
 	if idx != -1
@@ -176,6 +190,9 @@ function! s:cmd_CMakeRun() abort
 endfunction
 
 function! s:cmd_CMakeClean() abort
+  if s:enabled != 1
+    return
+  endif
 	if s:build_dir == ''
 		throw 'Build directory not set'
 	endif
